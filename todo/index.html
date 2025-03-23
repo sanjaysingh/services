@@ -320,7 +320,7 @@
                         }
                     ],
                     authenticatorSelection: {
-                        authenticatorAttachment: "platform",
+                        authenticatorAttachment: "cross-platform",
                         userVerification: "required"
                     },
                     timeout: 60000
@@ -347,11 +347,14 @@
                 const passkeyData = {
                     user_id: signInData.user.id,
                     credential_id: btoa(credential.id),
-                    public_key: btoa(credential.response.getPublicKey()),
+                    public_key: btoa(new Uint8Array(credential.response.getPublicKey())),
                     counter: credential.response.authenticatorData ? credential.response.authenticatorData[32] : 0
                 };
 
-                console.log('Storing passkey data:', passkeyData);
+                console.log('Storing passkey data:', {
+                    ...passkeyData,
+                    public_key: 'Public key length: ' + credential.response.getPublicKey().byteLength
+                });
 
                 const { data: storedPasskey, error: passkeyError } = await supabaseClient
                     .from('passkeys')
@@ -392,6 +395,8 @@
                     throw new Error('No passkeys found. Please register first.');
                 }
 
+                console.log('Found passkeys:', assertionOptions.length);
+
                 // Create assertion options for the browser
                 const assertion = {
                     challenge: new Uint8Array(32),
@@ -403,6 +408,8 @@
                     timeout: 60000
                 };
 
+                console.log('Created assertion options with credentials:', assertion.allowCredentials.length);
+
                 // Get assertion from browser
                 const credential = await navigator.credentials.get({
                     publicKey: assertion
@@ -411,6 +418,11 @@
                 if (!credential) {
                     throw new Error('No credential returned');
                 }
+
+                console.log('Got credential:', {
+                    id: btoa(credential.id),
+                    type: credential.type
+                });
 
                 // Find matching passkey
                 const passkey = assertionOptions.find(pk => 
@@ -421,6 +433,8 @@
                     console.error('No matching passkey found for credential:', btoa(credential.id));
                     throw new Error('Invalid passkey');
                 }
+
+                console.log('Found matching passkey for user:', passkey.user_id);
 
                 // Get user data
                 const { data: userData, error: userError } = await supabaseClient
