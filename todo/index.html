@@ -282,6 +282,8 @@
                     throw userError;
                 }
 
+                console.log('User created successfully:', userData);
+
                 // Sign in immediately after signup
                 const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
                     email: `${username}@${window.location.hostname}`,
@@ -292,6 +294,8 @@
                     console.error('Sign in error:', signInError);
                     throw signInError;
                 }
+
+                console.log('Signed in successfully:', signInData);
 
                 // Generate passkey
                 const publicKeyOptions = {
@@ -322,6 +326,8 @@
                     timeout: 60000
                 };
 
+                console.log('Creating passkey with options:', publicKeyOptions);
+
                 const credential = await navigator.credentials.create({
                     publicKey: publicKeyOptions
                 });
@@ -330,20 +336,35 @@
                     throw new Error('Failed to create passkey');
                 }
 
+                console.log('Passkey created successfully:', {
+                    id: btoa(credential.id),
+                    type: credential.type,
+                    hasPublicKey: !!credential.response.getPublicKey(),
+                    hasAuthenticatorData: !!credential.response.authenticatorData
+                });
+
                 // Store the passkey in Supabase
-                const { error: passkeyError } = await supabaseClient
+                const passkeyData = {
+                    user_id: signInData.user.id,
+                    credential_id: btoa(credential.id),
+                    public_key: btoa(credential.response.getPublicKey()),
+                    counter: credential.response.authenticatorData ? credential.response.authenticatorData[32] : 0
+                };
+
+                console.log('Storing passkey data:', passkeyData);
+
+                const { data: storedPasskey, error: passkeyError } = await supabaseClient
                     .from('passkeys')
-                    .insert([{
-                        user_id: signInData.user.id,
-                        credential_id: btoa(credential.id),
-                        public_key: btoa(credential.response.getPublicKey()),
-                        counter: credential.response.authenticatorData ? credential.response.authenticatorData[32] : 0
-                    }]);
+                    .insert([passkeyData])
+                    .select()
+                    .single();
 
                 if (passkeyError) {
                     console.error('Passkey storage error:', passkeyError);
                     throw passkeyError;
                 }
+
+                console.log('Passkey stored successfully:', storedPasskey);
                 
                 currentUser = signInData.user;
                 showTodo();
