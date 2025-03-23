@@ -424,7 +424,7 @@
                     throw signInError;
                 }
 
-                currentUser = userData;
+                currentUser = signInData.user;
                 showTodo();
                 loadTodos();
             } catch (error) {
