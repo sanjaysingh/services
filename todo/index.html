@@ -362,7 +362,14 @@
                     .from('passkeys')
                     .select('*');
 
-                if (optionsError) throw optionsError;
+                if (optionsError) {
+                    console.error('Error getting passkeys:', optionsError);
+                    throw optionsError;
+                }
+
+                if (!assertionOptions || assertionOptions.length === 0) {
+                    throw new Error('No passkeys found. Please register first.');
+                }
 
                 // Create assertion options for the browser
                 const assertion = {
@@ -390,6 +397,7 @@
                 );
 
                 if (!passkey) {
+                    console.error('No matching passkey found for credential:', btoa(credential.id));
                     throw new Error('Invalid passkey');
                 }
 
@@ -400,7 +408,10 @@
                     .eq('id', passkey.user_id)
                     .single();
 
-                if (userError) throw userError;
+                if (userError) {
+                    console.error('Error getting user data:', userError);
+                    throw userError;
+                }
 
                 // Sign in with Supabase
                 const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
@@ -408,14 +419,17 @@
                     password: 'temp-password' // This will be ignored since we're using passkey
                 });
 
-                if (signInError) throw signInError;
+                if (signInError) {
+                    console.error('Sign in error:', signInError);
+                    throw signInError;
+                }
 
                 currentUser = userData;
                 showTodo();
                 loadTodos();
             } catch (error) {
                 console.error('Login error:', error.message);
-                alert('Login failed. Please try again.');
+                alert(error.message || 'Login failed. Please try again.');
             }
         }
 
