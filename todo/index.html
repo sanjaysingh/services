@@ -439,6 +439,11 @@
             if (!text) return;
             
             try {
+                if (!currentUser) {
+                    console.error('No user logged in');
+                    return;
+                }
+
                 const { error } = await supabaseClient
                     .from('todos')
                     .insert([{
@@ -448,7 +453,10 @@
                         created_at: new Date().toISOString()
                     }]);
                     
-                if (error) throw error;
+                if (error) {
+                    console.error('Error adding todo:', error);
+                    throw error;
+                }
                 
                 todoInput.value = '';
                 loadTodos();
@@ -461,12 +469,21 @@
         // Toggle todo completion
         async function toggleTodo(todoId, completed) {
             try {
+                if (!currentUser) {
+                    console.error('No user logged in');
+                    return;
+                }
+
                 const { error } = await supabaseClient
                     .from('todos')
                     .update({ completed: !completed })
-                    .eq('id', todoId);
+                    .eq('id', todoId)
+                    .eq('user_id', currentUser.id);
                     
-                if (error) throw error;
+                if (error) {
+                    console.error('Error toggling todo:', error);
+                    throw error;
+                }
                 
                 loadTodos();
             } catch (error) {
@@ -478,12 +495,21 @@
         // Delete todo
         async function deleteTodo(todoId) {
             try {
+                if (!currentUser) {
+                    console.error('No user logged in');
+                    return;
+                }
+
                 const { error } = await supabaseClient
                     .from('todos')
                     .delete()
-                    .eq('id', todoId);
+                    .eq('id', todoId)
+                    .eq('user_id', currentUser.id);
                     
-                if (error) throw error;
+                if (error) {
+                    console.error('Error deleting todo:', error);
+                    throw error;
+                }
                 
                 loadTodos();
             } catch (error) {
@@ -495,15 +521,28 @@
         // Load todos
         async function loadTodos() {
             try {
+                if (!currentUser) {
+                    console.error('No user logged in');
+                    return;
+                }
+
                 const { data: todos, error } = await supabaseClient
                     .from('todos')
                     .select('*')
                     .eq('user_id', currentUser.id)
                     .order('created_at', { ascending: false });
                     
-                if (error) throw error;
+                if (error) {
+                    console.error('Error loading todos:', error);
+                    throw error;
+                }
                 
                 todoList.innerHTML = '';
+                if (!todos || todos.length === 0) {
+                    todoList.innerHTML = '<li class="text-center text-muted">No todos yet. Add one above!</li>';
+                    return;
+                }
+
                 todos.forEach(todo => {
                     const li = document.createElement('li');
                     li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
@@ -525,7 +564,7 @@
                 });
             } catch (error) {
                 console.error('Load todos error:', error.message);
-                alert('Failed to load todos. Please try again.');
+                todoList.innerHTML = '<li class="text-center text-danger">Failed to load todos. Please try again.</li>';
             }
         }
 
@@ -533,11 +572,13 @@
         function showTodo() {
             authContainer.classList.add('hidden');
             todoContainer.classList.remove('hidden');
+            todoContainer.classList.add('visible');
         }
 
         // Show auth interface
         function showAuth() {
             authContainer.classList.remove('hidden');
+            todoContainer.classList.remove('visible');
             todoContainer.classList.add('hidden');
         }
 
