@@ -326,6 +326,10 @@
                     publicKey: publicKeyOptions
                 });
 
+                if (!credential) {
+                    throw new Error('Failed to create passkey');
+                }
+
                 // Store the passkey in Supabase
                 const { error: passkeyError } = await supabaseClient
                     .from('passkeys')
@@ -333,10 +337,13 @@
                         user_id: signInData.user.id,
                         credential_id: btoa(credential.id),
                         public_key: btoa(credential.response.getPublicKey()),
-                        counter: credential.response.authenticatorData[32]
+                        counter: credential.response.authenticatorData ? credential.response.authenticatorData[32] : 0
                     }]);
 
-                if (passkeyError) throw passkeyError;
+                if (passkeyError) {
+                    console.error('Passkey storage error:', passkeyError);
+                    throw passkeyError;
+                }
                 
                 currentUser = signInData.user;
                 showTodo();
