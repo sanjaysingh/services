@@ -321,7 +321,8 @@
                     ],
                     authenticatorSelection: {
                         authenticatorAttachment: "cross-platform",
-                        userVerification: "required"
+                        userVerification: "preferred",
+                        requireResidentKey: true
                     },
                     timeout: 60000
                 };
@@ -404,7 +405,7 @@
                         type: 'public-key',
                         id: Uint8Array.from(atob(pk.credential_id), c => c.charCodeAt(0))
                     })),
-                    userVerification: 'required',
+                    userVerification: 'preferred',
                     timeout: 60000
                 };
 
@@ -412,7 +413,8 @@
 
                 // Get assertion from browser
                 const credential = await navigator.credentials.get({
-                    publicKey: assertion
+                    publicKey: assertion,
+                    mediation: 'optional'
                 });
 
                 if (!credential) {
@@ -448,18 +450,12 @@
                     throw userError;
                 }
 
-                // Sign in with Supabase
-                const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
-                    email: `${userData.username}@${window.location.hostname}`,
-                    password: 'temp-password' // This will be ignored since we're using passkey
-                });
+                // Set the current user directly since we've verified their identity with the passkey
+                currentUser = {
+                    id: passkey.user_id,
+                    username: userData.username
+                };
 
-                if (signInError) {
-                    console.error('Sign in error:', signInError);
-                    throw signInError;
-                }
-
-                currentUser = signInData.user;
                 showTodo();
                 loadTodos();
             } catch (error) {
