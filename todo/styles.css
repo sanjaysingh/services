@@ -1,0 +1,81 @@
+body {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.todo-item {
+    transition: background-color 0.2s;
+}
+
+.todo-item:hover {
+    background-color: #f8f9fa;
+}
+
+.todo-item:last-child {
+    border-bottom: none !important;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-danger {
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.btn-danger:hover {
+    opacity: 1;
+}
+
+/* Custom scrollbar for todo list */
+.todo-list {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.todo-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading state styles */
+.loading {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Animation for todo items */
+.todo-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+} 

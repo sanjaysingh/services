@@ -4,640 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .auth-container, .todo-container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .auth-container {
-            text-align: center;
-        }
-
-        .auth-container h1 {
-            color: #2c3e50;
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            font-weight: 600;
-        }
-
-        .auth-form {
-            max-width: 320px;
-            margin: 0 auto;
-        }
-
-        .auth-section {
-            padding: 1.5rem;
-            border-radius: 8px;
-            background: #f8f9fa;
-            margin-bottom: 1rem;
-        }
-
-        .auth-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .auth-section h3 {
-            font-size: 1.1rem;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .form-control {
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 0.75rem 1rem;
-            font-size: 0.95rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .form-control:focus {
-            border-color: #4a90e2;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            font-size: 0.95rem;
-            font-weight: 500;
-            border-radius: 6px;
-            transition: all 0.2s;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .btn-primary {
-            background-color: #4a90e2;
-            border-color: #4a90e2;
-        }
-
-        .btn-primary:hover {
-            background-color: #357abd;
-            border-color: #357abd;
-        }
-
-        .btn-outline-danger {
-            color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .btn-outline-danger:hover {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-        }
-
-        .todo-container {
-            display: none;
-        }
-
-        .todo-container.visible {
-            display: block;
-        }
-
-        .todo-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .todo-header h2 {
-            color: #2c3e50;
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .todo-input-group {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-        }
-
-        .todo-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: #f8f9fa;
-            margin-bottom: 0.75rem;
-            border-radius: 6px;
-            transition: all 0.2s;
-            border: 1px solid #e0e0e0;
-        }
-
-        .todo-item:hover {
-            background: #f1f3f5;
-            border-color: #dee2e6;
-        }
-
-        .todo-item.completed {
-            background: #e8f5e9;
-            border-color: #c8e6c9;
-            text-decoration: line-through;
-            color: #666;
-        }
-
-        .todo-text {
-            flex-grow: 1;
-            margin: 0 1rem;
-        }
-
-        .form-check-input {
-            width: 1.1rem;
-            height: 1.1rem;
-            margin-top: 0;
-            cursor: pointer;
-        }
-
-        .btn-link {
-            padding: 0.5rem;
-            color: #dc3545;
-            font-size: 1.25rem;
-            line-height: 1;
-        }
-
-        .btn-link:hover {
-            color: #c82333;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div class="container">
-        <div id="auth-container" class="auth-container">
-            <h1>Todo App</h1>
-            <div class="auth-form">
-                <div class="auth-section">
-                    <h3>New User?</h3>
-                    <input type="text" id="username-input" class="form-control" placeholder="Choose a username" required>
-                    <button id="register-btn" class="btn btn-primary">Register with Passkey</button>
-                </div>
-                <div class="auth-section">
-                    <h3>Already Registered?</h3>
-                    <button id="login-btn" class="btn btn-outline-primary">Login with Passkey</button>
-                </div>
-            </div>
-        </div>
+    <div id="app" class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="text-center mb-4">Todo App</h1>
+                        
+                        <!-- Login Form -->
+                        <div v-if="!isAuthenticated">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="email" v-model="email" :disabled="otpSent">
+                            </div>
+                            
+                            <div v-if="otpSent" class="mb-3">
+                                <label for="otp" class="form-label">Verification Code</label>
+                                <input type="text" class="form-control" id="otp" v-model="otp">
+                            </div>
 
-        <div id="todo-container" class="todo-container">
-            <div class="todo-header">
-                <h2>My Todos</h2>
-                <button id="logout-btn" class="btn btn-outline-danger">Logout</button>
+                            <div class="d-grid gap-2">
+                                <button v-if="!otpSent" 
+                                        class="btn btn-primary" 
+                                        @click="sendOTP" 
+                                        :disabled="loading">
+                                    Send Code
+                                </button>
+                                <button v-else 
+                                        class="btn btn-primary" 
+                                        @click="verifyOTP" 
+                                        :disabled="loading">
+                                    Verify Code
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Todo List -->
+                        <div v-else>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h2 class="mb-0">My Todos</h2>
+                                <button class="btn btn-outline-danger" @click="signOut">Sign Out</button>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           v-model="newTodo" 
+                                           @keyup.enter="addTodo"
+                                           placeholder="Add a new todo">
+                                    <button class="btn btn-primary" @click="addTodo">Add</button>
+                                </div>
+                            </div>
+
+                            <div class="list-group">
+                                <div v-for="todo in todos" 
+                                     :key="todo.id" 
+                                     class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                               type="checkbox" 
+                                               v-model="todo.completed"
+                                               @change="updateTodo(todo)">
+                                        <label class="form-check-label" :class="{ 'text-decoration-line-through': todo.completed }">
+                                            {{ todo.title }}
+                                        </label>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger" @click="deleteTodo(todo.id)">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div v-if="error" class="alert alert-danger mt-3">
+                            {{ error }}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="todo-input-group">
-                <input type="text" id="todo-input" class="form-control" placeholder="Add a new todo...">
-                <button id="add-todo-btn" class="btn btn-primary">Add</button>
-            </div>
-            <ul id="todo-list" class="list-unstyled"></ul>
         </div>
     </div>
 
-    <!-- Load dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Initialize Supabase client
-        const supabaseUrl = 'https://xnifgftcorsfexoiykrk.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuaWZnZnRjb3JzZmV4b2l5a3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI2MDg2NzksImV4cCI6MjA1ODE4NDY3OX0.wyDnGOhvqJMO3TaY1IOaWxtu_Am_UkGHdv9kkLagHU4';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // DOM Elements
-        const authContainer = document.getElementById('auth-container');
-        const todoContainer = document.getElementById('todo-container');
-        const registerBtn = document.getElementById('register-btn');
-        const loginBtn = document.getElementById('login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const usernameInput = document.getElementById('username-input');
-        const todoInput = document.getElementById('todo-input');
-        const addTodoBtn = document.getElementById('add-todo-btn');
-        const todoList = document.getElementById('todo-list');
-
-        // State
-        let currentUser = null;
-
-        // Register with passkey
-        async function register() {
-            try {
-                const username = usernameInput.value.trim();
-                if (!username) {
-                    alert('Please enter a username');
-                    return;
-                }
-
-                // Validate username format (alphanumeric, 3-20 chars)
-                const usernameRegex = /^[a-zA-Z0-9]{3,20}$/;
-                if (!usernameRegex.test(username)) {
-                    alert('Username must be 3-20 characters long and contain only letters and numbers');
-                    return;
-                }
-
-                // Create a secure random password (required by Supabase but never used)
-                const randomBytes = new Uint8Array(48);
-                crypto.getRandomValues(randomBytes);
-                const tempPassword = btoa(String.fromCharCode(...randomBytes)).slice(0, 72);
-                
-                console.log('Attempting registration with username:', username);
-                
-                // Create user in Supabase with temporary password
-                const { data: userData, error: userError } = await supabaseClient.auth.signUp({
-                    email: `${username}@${window.location.hostname}`, // Required by Supabase but not used
-                    password: tempPassword,
-                    options: {
-                        data: {
-                            username: username
-                        },
-                        emailRedirectTo: window.location.origin
-                    }
-                });
-                
-                if (userError) {
-                    console.error('Supabase signup error:', userError);
-                    throw userError;
-                }
-
-                console.log('User created successfully:', userData);
-
-                // Sign in immediately after signup
-                const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
-                    email: `${username}@${window.location.hostname}`,
-                    password: tempPassword
-                });
-
-                if (signInError) {
-                    console.error('Sign in error:', signInError);
-                    throw signInError;
-                }
-
-                console.log('Signed in successfully:', signInData);
-
-                // Generate passkey
-                const publicKeyOptions = {
-                    challenge: new Uint8Array(32),
-                    rp: {
-                        name: "Todo App",
-                        id: window.location.hostname
-                    },
-                    user: {
-                        id: new TextEncoder().encode(signInData.user.id),
-                        name: username,
-                        displayName: username
-                    },
-                    pubKeyCredParams: [
-                        {
-                            type: "public-key",
-                            alg: -7 // ES256
-                        },
-                        {
-                            type: "public-key",
-                            alg: -257 // RS256
-                        }
-                    ],
-                    authenticatorSelection: {
-                        authenticatorAttachment: "cross-platform",
-                        userVerification: "preferred",
-                        requireResidentKey: true
-                    },
-                    timeout: 60000
-                };
-
-                console.log('Creating passkey with options:', publicKeyOptions);
-
-                const credential = await navigator.credentials.create({
-                    publicKey: publicKeyOptions
-                });
-
-                if (!credential) {
-                    throw new Error('Failed to create passkey');
-                }
-
-                console.log('Passkey created successfully:', {
-                    id: btoa(credential.id),
-                    type: credential.type,
-                    hasPublicKey: !!credential.response.getPublicKey(),
-                    hasAuthenticatorData: !!credential.response.authenticatorData
-                });
-
-                // Store the passkey in Supabase
-                const passkeyData = {
-                    user_id: signInData.user.id,
-                    credential_id: btoa(credential.id),
-                    public_key: btoa(new Uint8Array(credential.response.getPublicKey())),
-                    counter: credential.response.authenticatorData ? credential.response.authenticatorData[32] : 0
-                };
-
-                console.log('Storing passkey data:', {
-                    ...passkeyData,
-                    public_key: 'Public key length: ' + credential.response.getPublicKey().byteLength
-                });
-
-                const { data: storedPasskey, error: passkeyError } = await supabaseClient
-                    .from('passkeys')
-                    .insert([passkeyData])
-                    .select()
-                    .single();
-
-                if (passkeyError) {
-                    console.error('Passkey storage error:', passkeyError);
-                    throw passkeyError;
-                }
-
-                console.log('Passkey stored successfully:', storedPasskey);
-                
-                currentUser = signInData.user;
-                showTodo();
-                loadTodos();
-            } catch (error) {
-                console.error('Registration error:', error.message);
-                alert('Registration failed. Please try again.');
-            }
-        }
-
-        // Login with passkey
-        async function login() {
-            try {
-                // Get assertion options from server
-                const { data: assertionOptions, error: optionsError } = await supabaseClient
-                    .from('passkeys')
-                    .select('*');
-
-                if (optionsError) {
-                    console.error('Error getting passkeys:', optionsError);
-                    throw optionsError;
-                }
-
-                if (!assertionOptions || assertionOptions.length === 0) {
-                    throw new Error('No passkeys found. Please register first.');
-                }
-
-                console.log('Found passkeys:', assertionOptions.length);
-
-                // Create assertion options for the browser
-                const assertion = {
-                    challenge: new Uint8Array(32),
-                    allowCredentials: assertionOptions.map(pk => ({
-                        type: 'public-key',
-                        id: Uint8Array.from(atob(pk.credential_id), c => c.charCodeAt(0))
-                    })),
-                    userVerification: 'preferred',
-                    timeout: 60000
-                };
-
-                console.log('Created assertion options with credentials:', assertion.allowCredentials.length);
-
-                // Get assertion from browser
-                const credential = await navigator.credentials.get({
-                    publicKey: assertion,
-                    mediation: 'optional'
-                });
-
-                if (!credential) {
-                    throw new Error('No credential returned');
-                }
-
-                console.log('Got credential:', {
-                    id: btoa(credential.id),
-                    type: credential.type
-                });
-
-                // Find matching passkey
-                const passkey = assertionOptions.find(pk => 
-                    btoa(credential.id) === pk.credential_id
-                );
-
-                if (!passkey) {
-                    console.error('No matching passkey found for credential:', btoa(credential.id));
-                    throw new Error('Invalid passkey');
-                }
-
-                console.log('Found matching passkey for user:', passkey.user_id);
-
-                // Get user data
-                const { data: userData, error: userError } = await supabaseClient
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', passkey.user_id)
-                    .single();
-
-                if (userError) {
-                    console.error('Error getting user data:', userError);
-                    throw userError;
-                }
-
-                // Set the current user directly since we've verified their identity with the passkey
-                currentUser = {
-                    id: passkey.user_id,
-                    username: userData.username
-                };
-
-                showTodo();
-                loadTodos();
-            } catch (error) {
-                console.error('Login error:', error.message);
-                alert(error.message || 'Login failed. Please try again.');
-            }
-        }
-
-        // Logout
-        async function logout() {
-            try {
-                const { error } = await supabaseClient.auth.signOut();
-                if (error) throw error;
-                
-                currentUser = null;
-                showAuth();
-            } catch (error) {
-                console.error('Logout error:', error.message);
-                alert('Logout failed. Please try again.');
-            }
-        }
-
-        // Add todo
-        async function addTodo() {
-            const text = todoInput.value.trim();
-            if (!text) return;
-            
-            try {
-                if (!currentUser) {
-                    console.error('No user logged in');
-                    return;
-                }
-
-                const { error } = await supabaseClient
-                    .from('todos')
-                    .insert([{
-                        user_id: currentUser.id,
-                        text: text,
-                        completed: false,
-                        created_at: new Date().toISOString()
-                    }]);
-                    
-                if (error) {
-                    console.error('Error adding todo:', error);
-                    throw error;
-                }
-                
-                todoInput.value = '';
-                loadTodos();
-            } catch (error) {
-                console.error('Add todo error:', error.message);
-                alert('Failed to add todo. Please try again.');
-            }
-        }
-
-        // Toggle todo completion
-        async function toggleTodo(todoId, completed) {
-            try {
-                if (!currentUser) {
-                    console.error('No user logged in');
-                    return;
-                }
-
-                const { error } = await supabaseClient
-                    .from('todos')
-                    .update({ completed: !completed })
-                    .eq('id', todoId)
-                    .eq('user_id', currentUser.id);
-                    
-                if (error) {
-                    console.error('Error toggling todo:', error);
-                    throw error;
-                }
-                
-                loadTodos();
-            } catch (error) {
-                console.error('Toggle todo error:', error.message);
-                alert('Failed to update todo. Please try again.');
-            }
-        }
-
-        // Delete todo
-        async function deleteTodo(todoId) {
-            try {
-                if (!currentUser) {
-                    console.error('No user logged in');
-                    return;
-                }
-
-                const { error } = await supabaseClient
-                    .from('todos')
-                    .delete()
-                    .eq('id', todoId)
-                    .eq('user_id', currentUser.id);
-                    
-                if (error) {
-                    console.error('Error deleting todo:', error);
-                    throw error;
-                }
-                
-                loadTodos();
-            } catch (error) {
-                console.error('Delete todo error:', error.message);
-                alert('Failed to delete todo. Please try again.');
-            }
-        }
-
-        // Load todos
-        async function loadTodos() {
-            try {
-                if (!currentUser) {
-                    console.error('No user logged in');
-                    return;
-                }
-
-                const { data: todos, error } = await supabaseClient
-                    .from('todos')
-                    .select('*')
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false });
-                    
-                if (error) {
-                    console.error('Error loading todos:', error);
-                    throw error;
-                }
-                
-                todoList.innerHTML = '';
-                if (!todos || todos.length === 0) {
-                    todoList.innerHTML = '<li class="text-center text-muted">No todos yet. Add one above!</li>';
-                    return;
-                }
-
-                todos.forEach(todo => {
-                    const li = document.createElement('li');
-                    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
-                    li.innerHTML = `
-                        <input type="checkbox" class="form-check-input me-3" ${todo.completed ? 'checked' : ''}>
-                        <span class="todo-text">${todo.text}</span>
-                        <button class="btn btn-link text-danger p-0 ms-2">×</button>
-                    `;
-                    
-                    li.querySelector('.form-check-input').addEventListener('change', () => {
-                        toggleTodo(todo.id, todo.completed);
-                    });
-                    
-                    li.querySelector('.btn-link').addEventListener('click', () => {
-                        deleteTodo(todo.id);
-                    });
-                    
-                    todoList.appendChild(li);
-                });
-            } catch (error) {
-                console.error('Load todos error:', error.message);
-                todoList.innerHTML = '<li class="text-center text-danger">Failed to load todos. Please try again.</li>';
-            }
-        }
-
-        // Show todo interface
-        function showTodo() {
-            authContainer.classList.add('hidden');
-            todoContainer.classList.remove('hidden');
-            todoContainer.classList.add('visible');
-        }
-
-        // Show auth interface
-        function showAuth() {
-            authContainer.classList.remove('hidden');
-            todoContainer.classList.remove('visible');
-            todoContainer.classList.add('hidden');
-        }
-
-        // Event Listeners
-        registerBtn.addEventListener('click', register);
-        loginBtn.addEventListener('click', login);
-        logoutBtn.addEventListener('click', logout);
-        addTodoBtn.addEventListener('click', addTodo);
-        todoInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTodo();
-        });
-
-        // Initialize
-        showAuth();
-    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="app.js"></script>
 </body>
-</html> 
+</html>
