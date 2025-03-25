@@ -15,10 +15,32 @@ const app = createApp({
         const otpSent = ref(false)
         const loading = ref(false)
         const error = ref('')
+        const isAlertFading = ref(false)
+        const alertTimeout = ref(null)
         const todos = ref([])
         const newTodo = ref('')
 
         // Methods
+        const setError = (message) => {
+            error.value = message
+            isAlertFading.value = false
+            
+            // Clear any existing timeout
+            if (alertTimeout.value) {
+                clearTimeout(alertTimeout.value)
+            }
+            
+            // Set new timeout for fading
+            alertTimeout.value = setTimeout(() => {
+                isAlertFading.value = true
+                // Clear error after fade animation
+                setTimeout(() => {
+                    error.value = ''
+                    isAlertFading.value = false
+                }, 300) // Match the CSS transition duration
+            }, 10000)
+        }
+
         const sendOTP = async () => {
             try {
                 loading.value = true
@@ -29,24 +51,14 @@ const app = createApp({
                     throw new Error('Please enter your email address')
                 }
 
-                console.log('Attempting to send OTP to:', email.value)
-                
                 const { data, error: signInError } = await supabaseClient.auth.signInWithOtp({
                     email: email.value,
                     options: {
-                        shouldCreateUser: true,
-                        emailRedirectTo: window.location.origin
+                        shouldCreateUser: true
                     }
                 })
 
                 if (signInError) {
-                    console.error('Sign in error details:', {
-                        message: signInError.message,
-                        name: signInError.name,
-                        status: signInError.status,
-                        stack: signInError.stack
-                    })
-                    
                     // Check for SMTP specific errors
                     if (signInError.message?.includes('SMTP') || 
                         signInError.message?.includes('email service') ||
@@ -62,26 +74,12 @@ const app = createApp({
                     
                     throw signInError
                 }
-
-                console.log('OTP response:', data)
                 
-                // Even if data is null, we still want to show the OTP input
-                // as Supabase might have sent the email successfully
                 otpSent.value = true
-                error.value = `Verification code sent to ${email.value}. Please check your inbox and spam folder.`
-                
-                // Log the current auth state
-                const { data: { session } } = await supabaseClient.auth.getSession()
-                console.log('Current session:', session)
+                setError(`Verification code sent to ${email.value}. Please check your inbox and spam folder.`)
                 
             } catch (err) {
-                console.error('Error details:', {
-                    message: err.message,
-                    name: err.name,
-                    stack: err.stack
-                })
-                
-                error.value = err.message || 'An error occurred while sending the code'
+                setError(err.message || 'An error occurred while sending the code')
             } finally {
                 loading.value = false
             }
@@ -97,7 +95,6 @@ const app = createApp({
                     throw new Error('Please enter the verification code')
                 }
 
-                console.log('Verifying OTP:', otp.value)
                 const { data, error: verifyError } = await supabaseClient.auth.verifyOtp({
                     email: email.value,
                     token: otp.value,
@@ -105,11 +102,9 @@ const app = createApp({
                 })
 
                 if (verifyError) {
-                    console.error('Verify error:', verifyError)
                     throw verifyError
                 }
 
-                console.log('Verify response:', data)
                 if (data?.user) {
                     isAuthenticated.value = true
                     await fetchTodos()
@@ -117,8 +112,7 @@ const app = createApp({
                     throw new Error('Verification failed. Please try again.')
                 }
             } catch (err) {
-                console.error('Error:', err)
-                error.value = err.message || 'An error occurred while verifying the code'
+                setError(err.message || 'An error occurred while verifying the code')
             } finally {
                 loading.value = false
             }
@@ -134,7 +128,7 @@ const app = createApp({
                 otp.value = ''
                 todos.value = []
             } catch (err) {
-                error.value = err.message
+                setError(err.message)
             }
         }
 
@@ -147,7 +141,7 @@ const app = createApp({
                 if (fetchError) throw fetchError
                 todos.value = data
             } catch (err) {
-                error.value = err.message
+                setError(err.message)
             }
         }
 
@@ -167,7 +161,7 @@ const app = createApp({
                 todos.value.unshift(data[0])
                 newTodo.value = ''
             } catch (err) {
-                error.value = err.message
+                setError(err.message)
             }
         }
 
@@ -179,7 +173,7 @@ const app = createApp({
                     .eq('id', todo.id)
                 if (updateError) throw updateError
             } catch (err) {
-                error.value = err.message
+                setError(err.message)
             }
         }
 
@@ -192,15 +186,16 @@ const app = createApp({
                 if (deleteError) throw deleteError
                 todos.value = todos.value.filter(todo => todo.id !== id)
             } catch (err) {
-                error.value = err.message
+                setError(err.message)
             }
         }
 
-        // Check for existing session
+        // Check for existing session and get user email
         onMounted(async () => {
             const { data: { session } } = await supabaseClient.auth.getSession()
-            if (session) {
+            if (session?.user) {
                 isAuthenticated.value = true
+                email.value = session.user.email
                 await fetchTodos()
             }
         })
@@ -208,7 +203,8 @@ const app = createApp({
         // Watch for auth state changes
         supabaseClient.auth.onAuthStateChange((event, session) => {
             isAuthenticated.value = !!session
-            if (session) {
+            if (session?.user) {
+                email.value = session.user.email
                 fetchTodos()
             }
         })
@@ -220,6 +216,7 @@ const app = createApp({
             otpSent,
             loading,
             error,
+            isAlertFading,
             todos,
             newTodo,
             sendOTP,
