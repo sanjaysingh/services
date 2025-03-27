@@ -153,8 +153,7 @@ const app = createApp({
                 const { data, error: insertError } = await supabaseClient
                     .from('todos')
                     .insert([{ 
-                        title: newTodo.value,
-                        user_id: user.id
+                        title: newTodo.value
                     }])
                     .select()
                 if (insertError) throw insertError

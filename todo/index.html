@@ -34,13 +34,6 @@
             font-size: 0.875rem;
             color: #6c757d;
         }
-        .subtitle {
-            font-size: 0.875rem;
-            color: #6c757d;
-            text-align: center;
-            margin-top: -0.5rem;
-            margin-bottom: 1.5rem;
-        }
         .task-input-group {
             display: flex;
             gap: 8px;
@@ -78,11 +71,6 @@
             background-color: rgba(255, 255, 255, 0.1);
             border-color: white;
         }
-        .todo-header .subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            margin: 4px 0 0 0;
-            font-size: 0.875rem;
-        }
         .alert {
             font-size: 0.875rem;
             transition: opacity 0.3s ease-out;
@@ -92,6 +80,16 @@
         }
         .card-body {
             min-height: 320px;
+            position: relative;
+            padding-bottom: 3rem !important;
+        }
+        .app-footer {
+            position: absolute;
+            bottom: 1rem;
+            right: 1.5rem;
+            font-style: italic;
+            color: #6c757d;
+            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -101,8 +99,7 @@
         <div v-if="!isAuthenticated" class="auth-container">
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <h2 class="text-center mb-2">Todo Management</h2>
-                    <div class="subtitle">Lambda Apps</div>
+                    <h2 class="text-center mb-4">Todo Management</h2>
                     
                     <div class="mb-4">
                         <label for="email" class="form-label">Email address</label>
@@ -146,6 +143,8 @@
                          :class="{ 'fade-out': isAlertFading }">
                         {{ error }}
                     </div>
+
+                    <div class="app-footer">Lambda Apps</div>
                 </div>
             </div>
         </div>
@@ -157,7 +156,6 @@
                     <div class="todo-header d-flex justify-content-between align-items-center">
                         <div>
                             <h2 class="h4">My Tasks</h2>
-                            <div class="subtitle">Lambda Apps</div>
                         </div>
                         <div class="d-flex align-items-center">
                             <span class="user-email me-3">{{ email }}</span>
@@ -210,6 +208,8 @@
                             No tasks yet. Add one above!
                         </div>
                     </div>
+
+                    <div class="app-footer">Lambda Apps</div>
                 </div>
             </div>
         </div>
